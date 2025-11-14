@@ -1,5 +1,7 @@
 <?php
-require 'includes/db.php';
+require_once "includes/db.php";
+include __DIR__ . '/includes/navbar.php';
+
 
 if (!isset($_GET['id'])) {
     die("Producto no encontrado");
@@ -19,28 +21,34 @@ if (!$product) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title><?= $product['name'] ?></title>
-    <link rel="stylesheet" href="assets/style.css">
+    <title><?= htmlspecialchars($product['name']) ?></title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/cart.js" defer></script>
 </head>
 <body>
 
-<?php include 'includes/navbar.php'; ?>
+
 
 <div class="container">
 
     <div class="product-page">
 
         <div class="product-img-box">
-            <img src="<?= $product['image'] ?>" alt="<?= $product['name'] ?>">
+            <img src="<?= $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>">
         </div>
 
         <div class="product-info-box">
-            <h1><?= $product['name'] ?></h1>
+            <h1><?= htmlspecialchars($product['name']) ?></h1>
 
-            <p class="price">$<?= number_format($product['price'], 0, ',', '.') ?></p>
+            <p class="price">
+                $<?= number_format($product['price'], 0, ',', '.') ?>
+            </p>
 
-            <p class="description"><?= $product['description'] ?></p>
+            <p class="description">
+                <?= nl2br(htmlspecialchars($product['description'])) ?>
+            </p>
 
+            <!-- Botón agregar al carrito -->
             <button class="btn-add" onclick="addToCart(<?= $product['id'] ?>)">
                 🛒 Agregar al carrito
             </button>
@@ -49,22 +57,6 @@ if (!$product) {
     </div>
 
 </div>
-
-<script>
-function addToCart(id) {
-    let formData = new FormData();
-    formData.append("id", id);
-
-    fetch("ajax/add_to_cart.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(r => r.json())
-    .then(data => {
-        alert(data.message);
-    });
-}
-</script>
 
 </body>
 </html>

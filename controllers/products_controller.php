@@ -2,13 +2,8 @@
 require_once __DIR__ . "/../includes/db.php";
 
 function getFeaturedProducts() {
-    global $conn;
-    $sql = "SELECT * FROM products WHERE featured = 1";
-    $result = $conn->query($sql);
+    global $pdo;
 
-    $products = [];
-    while ($row = $result->fetch_assoc()) {
-        $products[] = $row;
-    }
-    return $products;
+    $stmt = $pdo->query("SELECT * FROM products WHERE featured = 1");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

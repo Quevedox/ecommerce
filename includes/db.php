@@ -1,12 +1,13 @@
 <?php
 $host = "localhost";
+$dbname = "shop";
 $user = "root";
 $pass = "";
-$db   = "shop";
 
-$conn = new mysqli($host, $user, $pass, $db);
-
-if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Error DB: " . $e->getMessage());
 }
 

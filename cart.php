@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "includes/db.php";
+require_once "./includes/db.php";
 
 // Obtener productos del carrito
 $cart = $_SESSION["cart"] ?? [];
@@ -9,13 +9,18 @@ $items = [];
 $total = 0;
 
 if (!empty($cart)) {
-    $ids = implode(",", array_keys($cart));
-    $result = $conn->query("SELECT * FROM products WHERE id IN ($ids)");
+    $ids = array_keys($cart);
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-    while ($row = $result->fetch_assoc()) {
-        $row["qty"] = $cart[$row["id"]];
-        $row["subtotal"] = $row["qty"] * $row["price"];
-        $total += $row["subtotal"];
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id IN ($placeholders)");
+    $stmt->execute($ids);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($rows as $row) {
+        $id = $row['id'];
+        $row['qty'] = $cart[$id];
+        $row['subtotal'] = $row['qty'] * $row['price'];
+        $total += $row['subtotal'];
         $items[] = $row;
     }
 }
