@@ -1,29 +1,70 @@
-<?php 
-include "includes/db.php"; 
-$id = $_GET['id'];
+<?php
+require 'includes/db.php';
 
-$p = $db->query("SELECT * FROM products WHERE id=$id")->fetch_assoc();
+if (!isset($_GET['id'])) {
+    die("Producto no encontrado");
+}
+
+$id = intval($_GET['id']);
+
+$stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+$stmt->execute([$id]);
+$product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$product) {
+    die("Producto no encontrado");
+}
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <link rel="stylesheet" href="styles.css">
-  <script src="js/cart.js" defer></script>
+    <meta charset="UTF-8">
+    <title><?= $product['name'] ?></title>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
-<h1><?= $p['name'] ?></h1>
+<?php include 'includes/navbar.php'; ?>
 
-<img src="<?= $p['image'] ?>">
-<p><?= $p['description'] ?></p>
-<p><strong>USD <?= $p['price'] ?></strong></p>
+<div class="container">
 
-<label>Cantidad:</label>
-<input type="number" id="qty" value="1" min="1">
+    <div class="product-page">
 
-<button onclick="addToCart(<?= $p['id'] ?>)">Agregar al carrito</button>
+        <div class="product-img-box">
+            <img src="<?= $product['image'] ?>" alt="<?= $product['name'] ?>">
+        </div>
 
-<div id="msg"></div>
+        <div class="product-info-box">
+            <h1><?= $product['name'] ?></h1>
+
+            <p class="price">$<?= number_format($product['price'], 0, ',', '.') ?></p>
+
+            <p class="description"><?= $product['description'] ?></p>
+
+            <button class="btn-add" onclick="addToCart(<?= $product['id'] ?>)">
+                🛒 Agregar al carrito
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function addToCart(id) {
+    let formData = new FormData();
+    formData.append("id", id);
+
+    fetch("ajax/add_to_cart.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        alert(data.message);
+    });
+}
+</script>
 
 </body>
 </html>

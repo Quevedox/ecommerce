@@ -31,6 +31,8 @@ $featured = getFeaturedProducts();
 
     <div class="product-grid">
         <?php foreach ($featured as $p): ?>
+            <a href="product.php?id=<?= $p['id'] ?>" class="product-link">
+
             <div class="product-card">
                 
                 <!-- Botón agregar -->
@@ -48,6 +50,7 @@ $featured = getFeaturedProducts();
                 <p class="price">$<?= number_format($p['price'], 0) ?></p>
 
             </div>
+            </a>
         <?php endforeach; ?>
     </div>
 </div>
